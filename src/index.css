@@ -8,39 +8,39 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
 
-    --card: 0 0% 98%;
-    --card-foreground: 0 0% 0%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 0 0% 0%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 8%;
 
     --secondary: 45 100% 51%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary-foreground: 0 0% 8%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
 
     --accent: 45 100% 51%;
-    --accent-foreground: 0 0% 0%;
+    --accent-foreground: 0 0% 8%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 0%;
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
+    --ring: 45 100% 51%;
 
     --radius: 0.75rem;
     
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 10%), hsl(0 0% 30%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 5%), hsl(0 0% 12%));
     --gradient-warm: linear-gradient(135deg, hsl(45 100% 51%), hsl(48 100% 60%));
-    --shadow-soft: 0 4px 20px hsla(0 0% 0% / 0.1);
+    --shadow-soft: 0 4px 20px hsla(0 0% 0% / 0.4);
     --shadow-glow: 0 8px 32px hsla(45 100% 51% / 0.3);
 
     --sidebar-background: 0 0% 98%;

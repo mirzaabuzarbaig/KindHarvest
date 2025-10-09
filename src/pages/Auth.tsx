@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Heart, ArrowLeft } from "lucide-react";
 import { z } from "zod";
+import heroImage from "@/assets/hero-children.jpg";
 
 const signupSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -125,8 +126,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      <div className="absolute inset-0">
+        <img 
+          src={heroImage} 
+          alt="Children laughing together" 
+          className="w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 bg-background/80" />
+      </div>
+      
+      <div className="w-full max-w-md relative z-10">
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
@@ -146,9 +156,9 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
+                <TabsTrigger value="login" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">Sign Up</TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
