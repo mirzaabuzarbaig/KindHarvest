@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart, ArrowLeft, User, Lock } from "lucide-react";
 import { z } from "zod";
 import heroImage from "@/assets/hero-children.jpg";
 
@@ -162,31 +162,63 @@ const Auth = () => {
               </TabsList>
 
               <TabsContent value="login">
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-foreground">Login Form</h2>
+                </div>
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={loginData.email}
-                      onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                      required
-                    />
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-secondary rounded flex items-center justify-center">
+                        <User className="w-5 h-5 text-secondary-foreground" />
+                      </div>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="Email or Phone"
+                        value={loginData.email}
+                        onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                        className="pl-16 h-12"
+                        required
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      value={loginData.password}
-                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      required
-                    />
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-secondary rounded flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-secondary-foreground" />
+                      </div>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        placeholder="Password"
+                        value={loginData.password}
+                        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                        className="pl-16 h-12"
+                        required
+                      />
+                    </div>
+                    <div className="text-left">
+                      <button type="button" className="text-sm text-secondary hover:underline">
+                        Forgot password?
+                      </button>
+                    </div>
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
+                  <Button type="submit" className="w-full h-12 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold" disabled={loading}>
                     {loading ? "Logging in..." : "Login"}
                   </Button>
+                  <div className="text-center pt-2">
+                    <span className="text-sm text-muted-foreground">Not a member? </span>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const signupTab = document.querySelector('[value="signup"]') as HTMLElement;
+                        signupTab?.click();
+                      }}
+                      className="text-sm text-secondary hover:underline font-medium"
+                    >
+                      Signup now
+                    </button>
+                  </div>
                 </form>
               </TabsContent>
 
