@@ -40,11 +40,7 @@ const Index = () => {
               Share Food. Save Lives. Build Community.
             </h1>
             
-            <p className="text-2xl md:text-3xl text-foreground font-medium max-w-2xl mx-auto leading-relaxed">
-              {user ? "Ready to make a difference?" : "Join our community"}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
               {user ? (
                 <>
                   <Button 
@@ -71,14 +67,17 @@ const Index = () => {
                   >
                     Sign Up <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline"
-                    onClick={() => navigate("/auth")}
-                    className="text-lg px-8 py-6 border-2 border-foreground hover:bg-muted/50 font-bold"
-                  >
-                    Sign In
-                  </Button>
+                  <div className="text-center">
+                    <p className="text-foreground text-sm mb-2">Already existing user?</p>
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      onClick={() => navigate("/auth")}
+                      className="text-lg px-8 py-6 border-2 border-foreground hover:bg-muted/50 font-bold"
+                    >
+                      Login
+                    </Button>
+                  </div>
                 </>
               )}
             </div>
@@ -127,27 +126,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-background">
+      {/* Stats Section - Simplified */}
+      <section className="py-10 bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center">
-            <div className="space-y-2">
-              <div className="text-5xl font-bold text-secondary">
-                Zero
-              </div>
-              <div className="text-foreground">Setup Cost</div>
+          <div className="flex flex-wrap justify-center gap-6 max-w-3xl mx-auto text-center">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-secondary rounded-full"></div>
+              <span className="text-sm text-muted-foreground">Zero Setup Cost</span>
             </div>
-            <div className="space-y-2">
-              <div className="text-5xl font-bold text-secondary">
-                Real-time
-              </div>
-              <div className="text-foreground">Updates</div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-secondary rounded-full"></div>
+              <span className="text-sm text-muted-foreground">Real-time Updates</span>
             </div>
-            <div className="space-y-2">
-              <div className="text-5xl font-bold text-secondary">
-                AI-Powered
-              </div>
-              <div className="text-foreground">Matching</div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-secondary rounded-full"></div>
+              <span className="text-sm text-muted-foreground">AI-Powered Matching</span>
             </div>
           </div>
         </div>
