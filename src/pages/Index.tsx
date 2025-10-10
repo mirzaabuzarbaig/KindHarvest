@@ -67,17 +67,6 @@ const Index = () => {
                   >
                     Sign Up <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
-                  <div className="text-center">
-                    <p className="text-foreground text-sm mb-2">Already existing user?</p>
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      onClick={() => navigate("/auth")}
-                      className="text-lg px-8 py-6 border-2 border-foreground hover:bg-muted/50 font-bold"
-                    >
-                      Login
-                    </Button>
-                  </div>
                 </>
               )}
             </div>
