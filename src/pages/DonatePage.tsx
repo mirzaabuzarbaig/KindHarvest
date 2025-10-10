@@ -85,6 +85,17 @@ const DonatePage = () => {
         throw new Error("You must be logged in to post food");
       }
 
+      // Verify user has donor role
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!roleData || roleData.role !== "donor") {
+        throw new Error("You must be a donor to post food donations");
+      }
+
       const { error } = await supabase
         .from("food_listings")
         .insert({
@@ -103,7 +114,10 @@ const DonatePage = () => {
           status: "available"
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Insert error:", error);
+        throw error;
+      }
 
       toast({
         title: "Success!",

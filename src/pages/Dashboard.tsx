@@ -27,22 +27,39 @@ const Dashboard = () => {
       setUser(session.user);
 
       // Fetch user role
-      const { data: roleData } = await supabase
+      const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
+
+      if (roleError) {
+        console.error("Error fetching role:", roleError);
+      }
 
       if (roleData) {
         setUserRole(roleData.role);
+      } else {
+        // No role found, redirect to auth
+        toast({
+          title: "Setup Required",
+          description: "Please complete your profile setup",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
       }
 
       // Fetch profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
+
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+      }
 
       if (profileData) {
         setProfile(profileData);
