@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,58 +39,6 @@ const Auth = () => {
     email: "",
     password: ""
   });
-
-  const [sessionUser, setSessionUser] = useState<{ id: string; email?: string } | null>(null);
-  const [needsSetup, setNeedsSetup] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user ?? null;
-      if (!active) return;
-      setSessionUser(user);
-
-      if (user) {
-        const [{ data: roleData }, { data: profData }] = await Promise.all([
-          supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id)
-            .maybeSingle(),
-          supabase
-            .from("profiles")
-            .select("full_name, phone, address")
-            .eq("id", user.id)
-            .maybeSingle(),
-        ]);
-
-        if (!active) return;
-        setNeedsSetup(!roleData?.role || !profData?.full_name);
-
-        if (profData) {
-          setSignupData((prev) => ({
-            ...prev,
-            fullName: (profData as any).full_name || "",
-            phone: (profData as any).phone || "",
-            address: (profData as any).address || "",
-          }));
-        }
-      } else {
-        setNeedsSetup(false);
-      }
-    })();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setSessionUser(session?.user ?? null);
-    });
-
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, []);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,256 +155,145 @@ const Auth = () => {
             <CardDescription>Connect hearts and hands to reduce food waste</CardDescription>
           </CardHeader>
           <CardContent>
-            {needsSetup && sessionUser ? (
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  setLoading(true);
-                  try {
-                    if (!sessionUser) throw new Error("Not logged in");
+            <Tabs defaultValue="login">
+              <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
+                <TabsTrigger value="login" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">Sign Up</TabsTrigger>
+              </TabsList>
 
-                    // Ensure role exists
-                    const { data: roleData } = await supabase
-                      .from("user_roles")
-                      .select("role")
-                      .eq("user_id", sessionUser.id)
-                      .maybeSingle();
-
-                    if (!roleData?.role) {
-                      if (!signupData.role) throw new Error("Please select a role");
-                      const { error: roleErr } = await supabase
-                        .from("user_roles")
-                        .insert({ user_id: sessionUser.id, role: signupData.role as any });
-                      if (roleErr) throw roleErr;
-                    }
-
-                    // Upsert profile
-                    const { error: profileErr } = await supabase
-                      .from("profiles")
-                      .upsert({
-                        id: sessionUser.id,
-                        full_name: signupData.fullName,
-                        phone: signupData.phone,
-                        address: signupData.address,
-                      });
-                    if (profileErr) throw profileErr;
-
-                    toast({
-                      title: "Profile updated",
-                      description: "You're all set! Redirecting to your dashboard.",
-                    });
-                    navigate("/dashboard");
-                  } catch (err) {
-                    toast({
-                      title: "Setup Error",
-                      description: err instanceof Error ? err.message : "Failed to complete setup",
-                      variant: "destructive",
-                    });
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-                className="space-y-4"
-              >
-                <div className="text-center mb-2">
-                  <CardTitle className="text-2xl">Complete your profile</CardTitle>
-                  <CardDescription>Finish setup to continue</CardDescription>
+              <TabsContent value="login">
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-foreground">Login Form</h2>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="setup-role">I am a</Label>
-                  <Select
-                    value={signupData.role}
-                    onValueChange={(value) => setSignupData({ ...signupData, role: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="donor">Donor (I have food to share)</SelectItem>
-                      <SelectItem value="recipient">Recipient (I need food)</SelectItem>
-                      <SelectItem value="nonprofit">Nonprofit Organization</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="setup-name">Full Name</Label>
-                  <Input
-                    id="setup-name"
-                    value={signupData.fullName}
-                    onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="setup-phone">Phone (Optional)</Label>
-                  <Input
-                    id="setup-phone"
-                    type="tel"
-                    value={signupData.phone}
-                    onChange={(e) => setSignupData({ ...signupData, phone: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="setup-address">Address</Label>
-                  <Input
-                    id="setup-address"
-                    value={signupData.address}
-                    onChange={(e) => setSignupData({ ...signupData, address: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Saving..." : "Save & Continue"}
-                </Button>
-              </form>
-            ) : (
-              <>
-                <Tabs defaultValue="login">
-                  <TabsList className="grid w-full grid-cols-2 bg-muted p-1">
-                    <TabsTrigger value="login" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">Sign In</TabsTrigger>
-                    <TabsTrigger value="signup" className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">Sign Up</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="login">
-                    <div className="text-center mb-6">
-                      <h2 className="text-2xl font-bold text-foreground">Login Form</h2>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-secondary rounded flex items-center justify-center">
+                        <User className="w-5 h-5 text-secondary-foreground" />
+                      </div>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="Email or Phone"
+                        value={loginData.email}
+                        onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                        className="pl-16 h-12"
+                        required
+                      />
                     </div>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="relative">
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-secondary rounded flex items-center justify-center">
-                            <User className="w-5 h-5 text-secondary-foreground" />
-                          </div>
-                          <Input
-                            id="login-email"
-                            type="email"
-                            placeholder="Email or Phone"
-                            value={loginData.email}
-                            onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                            className="pl-16 h-12"
-                            required
-                          />
-                        </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-secondary rounded flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-secondary-foreground" />
                       </div>
-                      <div className="space-y-2">
-                        <div className="relative">
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-secondary rounded flex items-center justify-center">
-                            <Lock className="w-5 h-5 text-secondary-foreground" />
-                          </div>
-                          <Input
-                            id="login-password"
-                            type="password"
-                            placeholder="Password"
-                            value={loginData.password}
-                            onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                            className="pl-16 h-12"
-                            required
-                          />
-                        </div>
-                        <div className="text-left">
-                          <button type="button" className="text-sm text-secondary hover:underline">
-                            Forgot password?
-                          </button>
-                        </div>
-                      </div>
-                      <Button type="submit" className="w-full h-12 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
-                      </Button>
-                      <div className="text-center pt-2">
-                        <span className="text-sm text-muted-foreground">Not a member? </span>
-                        <button 
-                          type="button"
-                          onClick={() => {
-                            const signupTab = document.querySelector('[value="signup"]') as HTMLElement;
-                            signupTab?.click();
-                          }}
-                          className="text-sm text-secondary hover:underline font-medium"
-                        >
-                          Signup now
-                        </button>
-                      </div>
-                    </form>
-                  </TabsContent>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        placeholder="Password"
+                        value={loginData.password}
+                        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                        className="pl-16 h-12"
+                        required
+                      />
+                    </div>
+                    <div className="text-left">
+                      <button type="button" className="text-sm text-secondary hover:underline">
+                        Forgot password?
+                      </button>
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full h-12 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold" disabled={loading}>
+                    {loading ? "Logging in..." : "Login"}
+                  </Button>
+                  <div className="text-center pt-2">
+                    <span className="text-sm text-muted-foreground">Not a member? </span>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const signupTab = document.querySelector('[value="signup"]') as HTMLElement;
+                        signupTab?.click();
+                      }}
+                      className="text-sm text-secondary hover:underline font-medium"
+                    >
+                      Signup now
+                    </button>
+                  </div>
+                </form>
+              </TabsContent>
 
-                  <TabsContent value="signup">
-                    <form onSubmit={handleSignup} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-role">I am a</Label>
-                        <Select
-                          value={signupData.role}
-                          onValueChange={(value) => setSignupData({ ...signupData, role: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="donor">Donor (I have food to share)</SelectItem>
-                            <SelectItem value="recipient">Recipient (I need food)</SelectItem>
-                            <SelectItem value="nonprofit">Nonprofit Organization</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-name">Full Name</Label>
-                        <Input
-                          id="signup-name"
-                          value={signupData.fullName}
-                          onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-email">Email</Label>
-                        <Input
-                          id="signup-email"
-                          type="email"
-                          placeholder="your@email.com"
-                          value={signupData.email}
-                          onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-password">Password</Label>
-                        <Input
-                          id="signup-password"
-                          type="password"
-                          value={signupData.password}
-                          onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-phone">Phone (Optional)</Label>
-                        <Input
-                          id="signup-phone"
-                          type="tel"
-                          value={signupData.phone}
-                          onChange={(e) => setSignupData({ ...signupData, phone: e.target.value })}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-address">Address</Label>
-                        <Input
-                          id="signup-address"
-                          value={signupData.address}
-                          onChange={(e) => setSignupData({ ...signupData, address: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Creating account..." : "Create Account"}
-                      </Button>
-                    </form>
-                  </TabsContent>
-                </Tabs>
-              </>
-            )}
+              <TabsContent value="signup">
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-role">I am a</Label>
+                    <Select
+                      value={signupData.role}
+                      onValueChange={(value) => setSignupData({ ...signupData, role: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="donor">Donor (I have food to share)</SelectItem>
+                        <SelectItem value="recipient">Recipient (I need food)</SelectItem>
+                        <SelectItem value="nonprofit">Nonprofit Organization</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name">Full Name</Label>
+                    <Input
+                      id="signup-name"
+                      value={signupData.fullName}
+                      onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={signupData.email}
+                      onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      value={signupData.password}
+                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Phone (Optional)</Label>
+                    <Input
+                      id="signup-phone"
+                      type="tel"
+                      value={signupData.phone}
+                      onChange={(e) => setSignupData({ ...signupData, phone: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-address">Address</Label>
+                    <Input
+                      id="signup-address"
+                      value={signupData.address}
+                      onChange={(e) => setSignupData({ ...signupData, address: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Creating account..." : "Create Account"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
