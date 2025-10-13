@@ -68,7 +68,7 @@ const Index = () => {
                     onClick={() => navigate("/auth")}
                     className="bg-secondary hover:bg-secondary/90 text-secondary-foreground hover:shadow-glow transition-all duration-300 text-lg px-8 py-6 font-bold"
                   >
-                    Sign Up <ArrowRight className="ml-2 w-5 h-5" />
+                    Sign In <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </>
               )}

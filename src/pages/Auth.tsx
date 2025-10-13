@@ -141,15 +141,6 @@ const Auth = () => {
       </div>
       
       <div className="w-full max-w-md relative z-10">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/")}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 w-4 h-4" />
-          Back to Home
-        </Button>
-
         <Card className="shadow-glow">
           <CardHeader className="text-center">
             <div className="mx-auto w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mb-4">
