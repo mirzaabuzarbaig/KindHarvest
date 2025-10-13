@@ -73,17 +73,22 @@ const ProfileSetup = () => {
     setLoading(true);
 
     try {
-      // Update profile
+      // Upsert profile (insert or update)
       const { error: profileError } = await supabase
         .from("profiles")
-        .update({
+        .upsert({
+          id: userId,
           full_name: profileData.fullName,
           phone: profileData.phone,
           address: profileData.address
-        })
-        .eq("id", userId);
+        }, {
+          onConflict: 'id'
+        });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile error:", profileError);
+        throw profileError;
+      }
 
       // Insert role
       const { error: roleError } = await supabase
@@ -93,7 +98,10 @@ const ProfileSetup = () => {
           role: profileData.role as "donor" | "recipient" | "nonprofit"
         }]);
 
-      if (roleError) throw roleError;
+      if (roleError) {
+        console.error("Role error:", roleError);
+        throw roleError;
+      }
 
       toast({
         title: "Success!",
