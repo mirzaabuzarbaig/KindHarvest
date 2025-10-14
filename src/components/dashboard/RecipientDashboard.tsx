@@ -187,7 +187,7 @@ const RecipientDashboard = ({ userRole }: RecipientDashboardProps) => {
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
-                    <span className="line-clamp-1">{listing.address}</span>
+                    <span className="line-clamp-1">{listing.general_area || "Location available upon request"}</span>
                   </div>
                   {listing.profiles && (
                     <div className="flex items-center gap-2 text-muted-foreground">

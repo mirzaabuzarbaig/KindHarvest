@@ -22,6 +22,7 @@ export type Database = {
           donor_id: string
           expiration_date: string
           food_type: string
+          general_area: string | null
           id: string
           image_url: string | null
           location_lat: number
@@ -41,6 +42,7 @@ export type Database = {
           donor_id: string
           expiration_date: string
           food_type: string
+          general_area?: string | null
           id?: string
           image_url?: string | null
           location_lat: number
@@ -60,6 +62,7 @@ export type Database = {
           donor_id?: string
           expiration_date?: string
           food_type?: string
+          general_area?: string | null
           id?: string
           image_url?: string | null
           location_lat?: number
@@ -149,6 +152,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_initial_user_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"] }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

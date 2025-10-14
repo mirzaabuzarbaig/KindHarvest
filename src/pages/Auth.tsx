@@ -8,6 +8,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Heart, ArrowLeft, User, Lock } from "lucide-react";
 import heroImage from "@/assets/hero-children.jpg";
+import { z } from "zod";
+
+const authSchema = z.object({
+  email: z.string()
+    .trim()
+    .email({ message: "Invalid email address" })
+    .max(255, { message: "Email must be less than 255 characters" }),
+  password: z.string()
+    .min(8, { message: "Password must be at least 8 characters" })
+    .max(100, { message: "Password must be less than 100 characters" })
+    .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
+    .regex(/[a-z]/, { message: "Must contain at least one lowercase letter" })
+    .regex(/[0-9]/, { message: "Must contain at least one number" })
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -52,17 +66,15 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (!signupData.email || !signupData.password) {
-        throw new Error("Please fill in all fields");
-      }
-
-      if (signupData.password.length < 6) {
-        throw new Error("Password must be at least 6 characters");
-      }
+      // Validate input
+      const validated = authSchema.parse({
+        email: signupData.email.trim(),
+        password: signupData.password
+      });
       
       const { data, error } = await supabase.auth.signUp({
-        email: signupData.email,
-        password: signupData.password,
+        email: validated.email,
+        password: validated.password,
         options: {
           emailRedirectTo: `${window.location.origin}/profile-setup`
         }
@@ -79,11 +91,19 @@ const Auth = () => {
         navigate("/profile-setup");
       }
     } catch (error) {
-      toast({
-        title: "Signup Error",
-        description: error instanceof Error ? error.message : "Failed to create account",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Signup Error",
+          description: error instanceof Error ? error.message : "Failed to create account",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -94,9 +114,15 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Validate input
+      const validated = authSchema.parse({
+        email: loginData.email.trim(),
+        password: loginData.password
+      });
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password,
+        email: validated.email,
+        password: validated.password,
       });
 
       if (error) throw error;
@@ -119,11 +145,19 @@ const Auth = () => {
         navigate("/profile-setup");
       }
     } catch (error) {
-      toast({
-        title: "Login Error",
-        description: error instanceof Error ? error.message : "Failed to login",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Login Error",
+          description: error instanceof Error ? error.message : "Failed to login",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -246,7 +280,7 @@ const Auth = () => {
                       <Input
                         id="signup-password"
                         type="password"
-                        placeholder="Password (min 6 characters)"
+                        placeholder="Password (min 8 characters)"
                         value={signupData.password}
                         onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                         className="pl-16 h-12"

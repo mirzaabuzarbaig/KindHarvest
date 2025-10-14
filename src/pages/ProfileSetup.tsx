@@ -8,6 +8,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Heart } from "lucide-react";
+import { z } from "zod";
+
+const profileSchema = z.object({
+  fullName: z.string()
+    .trim()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(100, { message: "Name must be less than 100 characters" })
+    .regex(/^[a-zA-Z\s'-]+$/, { message: "Name contains invalid characters" }),
+  phone: z.string()
+    .trim()
+    .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 
+      { message: "Invalid phone number format" })
+    .max(20, { message: "Phone number too long" }),
+  address: z.string()
+    .trim()
+    .min(10, { message: "Address must be at least 10 characters" })
+    .max(200, { message: "Address must be less than 200 characters" }),
+  role: z.enum(['donor', 'recipient', 'nonprofit'], 
+    { message: "Invalid role selected" })
+});
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
@@ -73,14 +93,22 @@ const ProfileSetup = () => {
     setLoading(true);
 
     try {
+      // Validate input
+      const validated = profileSchema.parse({
+        fullName: profileData.fullName,
+        phone: profileData.phone,
+        address: profileData.address,
+        role: profileData.role
+      });
+
       // Upsert profile (insert or update)
       const { error: profileError } = await supabase
         .from("profiles")
         .upsert({
           id: userId,
-          full_name: profileData.fullName,
-          phone: profileData.phone,
-          address: profileData.address
+          full_name: validated.fullName,
+          phone: validated.phone,
+          address: validated.address
         }, {
           onConflict: 'id'
         });
@@ -90,13 +118,10 @@ const ProfileSetup = () => {
         throw profileError;
       }
 
-      // Insert role
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert([{ 
-          user_id: userId, 
-          role: profileData.role as "donor" | "recipient" | "nonprofit"
-        }]);
+      // Call the security definer function to assign role
+      const { error: roleError } = await supabase.rpc('assign_initial_user_role', {
+        _role: validated.role
+      });
 
       if (roleError) {
         console.error("Role error:", roleError);
@@ -110,11 +135,19 @@ const ProfileSetup = () => {
       
       navigate("/dashboard");
     } catch (error) {
-      toast({
-        title: "Setup Error",
-        description: error instanceof Error ? error.message : "Failed to set up profile",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Setup Error",
+          description: error instanceof Error ? error.message : "Failed to set up profile",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }

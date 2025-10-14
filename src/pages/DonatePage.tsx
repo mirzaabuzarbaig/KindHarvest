@@ -96,6 +96,9 @@ const DonatePage = () => {
         throw new Error("You must be a donor to post food donations");
       }
 
+      // Extract general area (first part before comma) for privacy
+      const generalArea = validated.address.split(',')[0].trim();
+
       const { error } = await supabase
         .from("food_listings")
         .insert({
@@ -107,6 +110,7 @@ const DonatePage = () => {
           quantity_unit: validated.quantityUnit,
           expiration_date: validated.expirationDate,
           address: validated.address,
+          general_area: generalArea,
           pickup_instructions: validated.pickupInstructions || "",
           transportation_available: validated.transportationAvailable,
           location_lat: formData.locationLat || 0,
