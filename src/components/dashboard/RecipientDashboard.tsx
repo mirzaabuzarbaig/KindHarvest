@@ -54,17 +54,14 @@ const RecipientDashboard = ({ userRole }: RecipientDashboardProps) => {
   const fetchListings = async () => {
     const { data, error } = await supabase
       .from("food_listings")
-      .select(`
-        *,
-        profiles:donor_id (
-          full_name,
-          phone
-        )
-      `)
+      .select("*")
       .eq("status", "available")
       .order("created_at", { ascending: false });
 
     if (error) {
+      if (import.meta.env.DEV) {
+        console.error("Error fetching listings:", error);
+      }
       toast({
         title: "Error",
         description: "Failed to fetch food listings",
@@ -189,12 +186,10 @@ const RecipientDashboard = ({ userRole }: RecipientDashboardProps) => {
                     <MapPin className="w-4 h-4" />
                     <span className="line-clamp-1">{listing.general_area || "Location available upon request"}</span>
                   </div>
-                  {listing.profiles && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <User className="w-4 h-4" />
-                      <span>Donor: {listing.profiles.full_name}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <User className="w-4 h-4" />
+                    <span>Verified Donor</span>
+                  </div>
                   {listing.transportation_available && (
                     <Badge variant="outline" className="text-xs">
                       Transportation Available
@@ -211,15 +206,11 @@ const RecipientDashboard = ({ userRole }: RecipientDashboardProps) => {
                   </div>
                 )}
 
-                {listing.profiles?.phone && (
-                  <div className="pt-4">
-                    <Button variant="outline" size="sm" className="w-full" asChild>
-                      <a href={`tel:${listing.profiles.phone}`}>
-                        Contact Donor
-                      </a>
-                    </Button>
-                  </div>
-                )}
+                <div className="pt-4">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Contact details available upon request approval
+                  </p>
+                </div>
               </CardContent>
             </Card>
           ))}

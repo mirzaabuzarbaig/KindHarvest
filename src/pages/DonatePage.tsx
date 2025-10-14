@@ -119,7 +119,9 @@ const DonatePage = () => {
         });
 
       if (error) {
-        console.error("Insert error:", error);
+        if (import.meta.env.DEV) {
+          console.error("Insert error:", error);
+        }
         throw error;
       }
 

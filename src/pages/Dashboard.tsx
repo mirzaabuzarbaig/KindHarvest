@@ -34,7 +34,9 @@ const Dashboard = () => {
         .maybeSingle();
 
       if (roleError) {
-        console.error("Error fetching role:", roleError);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching role:", roleError);
+        }
       }
 
       if (roleData) {
@@ -58,7 +60,9 @@ const Dashboard = () => {
         .maybeSingle();
 
       if (profileError) {
-        console.error("Error fetching profile:", profileError);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching profile:", profileError);
+        }
       }
 
       if (profileData) {

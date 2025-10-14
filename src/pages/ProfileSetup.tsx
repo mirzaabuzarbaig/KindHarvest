@@ -114,7 +114,9 @@ const ProfileSetup = () => {
         });
 
       if (profileError) {
-        console.error("Profile error:", profileError);
+        if (import.meta.env.DEV) {
+          console.error("Profile error:", profileError);
+        }
         throw profileError;
       }
 
@@ -124,7 +126,9 @@ const ProfileSetup = () => {
       });
 
       if (roleError) {
-        console.error("Role error:", roleError);
+        if (import.meta.env.DEV) {
+          console.error("Role error:", roleError);
+        }
         throw roleError;
       }
 
