@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Plus, Search } from "lucide-react";
+import { LogOut, Plus, Search, User } from "lucide-react";
 import DonorDashboard from "@/components/dashboard/DonorDashboard";
 import RecipientDashboard from "@/components/dashboard/RecipientDashboard";
 
@@ -132,6 +132,10 @@ const Dashboard = () => {
                 Find Food
               </Button>
             )}
+            <Button variant="outline" onClick={() => navigate("/profile")} className="gap-2">
+              <User className="w-4 h-4" />
+              Profile
+            </Button>
             <Button variant="ghost" onClick={handleLogout} className="gap-2">
               <LogOut className="w-4 h-4" />
               Logout
