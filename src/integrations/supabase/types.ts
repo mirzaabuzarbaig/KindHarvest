@@ -14,13 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_analytics: {
+        Row: {
+          analytics_id: string
+          created_at: string
+          predicted_demand: number | null
+          predicted_surplus: number | null
+          region: string
+          timestamp: string
+        }
+        Insert: {
+          analytics_id?: string
+          created_at?: string
+          predicted_demand?: number | null
+          predicted_surplus?: number | null
+          region: string
+          timestamp?: string
+        }
+        Update: {
+          analytics_id?: string
+          created_at?: string
+          predicted_demand?: number | null
+          predicted_surplus?: number | null
+          region?: string
+          timestamp?: string
+        }
+        Relationships: []
+      }
+      donation_requests: {
+        Row: {
+          created_at: string
+          donor_id: string
+          food_id: string
+          match_score: number | null
+          recipient_id: string
+          request_id: string
+          status: string
+          timestamp: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          donor_id: string
+          food_id: string
+          match_score?: number | null
+          recipient_id: string
+          request_id?: string
+          status?: string
+          timestamp?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          donor_id?: string
+          food_id?: string
+          match_score?: number | null
+          recipient_id?: string
+          request_id?: string
+          status?: string
+          timestamp?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donation_requests_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donation_requests_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "food_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donation_requests_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback_ratings: {
+        Row: {
+          comments: string | null
+          created_at: string
+          date: string
+          feedback_id: string
+          rated_user_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string
+          date?: string
+          feedback_id?: string
+          rated_user_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string
+          date?: string
+          feedback_id?: string
+          rated_user_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_ratings_rated_user_id_fkey"
+            columns: ["rated_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       food_listings: {
         Row: {
           address: string
+          category: string | null
           created_at: string
           description: string | null
           donor_id: string
           expiration_date: string
+          food_name: string | null
           food_type: string
           general_area: string | null
           id: string
@@ -28,6 +160,7 @@ export type Database = {
           location_lat: number
           location_lng: number
           pickup_instructions: string | null
+          pickup_time: string | null
           quantity: number
           quantity_unit: string
           status: Database["public"]["Enums"]["listing_status"]
@@ -37,10 +170,12 @@ export type Database = {
         }
         Insert: {
           address: string
+          category?: string | null
           created_at?: string
           description?: string | null
           donor_id: string
           expiration_date: string
+          food_name?: string | null
           food_type: string
           general_area?: string | null
           id?: string
@@ -48,6 +183,7 @@ export type Database = {
           location_lat: number
           location_lng: number
           pickup_instructions?: string | null
+          pickup_time?: string | null
           quantity: number
           quantity_unit: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -57,10 +193,12 @@ export type Database = {
         }
         Update: {
           address?: string
+          category?: string | null
           created_at?: string
           description?: string | null
           donor_id?: string
           expiration_date?: string
+          food_name?: string | null
           food_type?: string
           general_area?: string | null
           id?: string
@@ -68,6 +206,7 @@ export type Database = {
           location_lat?: number
           location_lng?: number
           pickup_instructions?: string | null
+          pickup_time?: string | null
           quantity?: number
           quantity_unit?: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -88,32 +227,38 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          contact_number: string | null
           created_at: string
           full_name: string
           id: string
           location_lat: number | null
           location_lng: number | null
           phone: string | null
+          profile_image_url: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
+          contact_number?: string | null
           created_at?: string
           full_name: string
           id: string
           location_lat?: number | null
           location_lng?: number | null
           phone?: string | null
+          profile_image_url?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
+          contact_number?: string | null
           created_at?: string
           full_name?: string
           id?: string
           location_lat?: number | null
           location_lng?: number | null
           phone?: string | null
+          profile_image_url?: string | null
           updated_at?: string
         }
         Relationships: []
