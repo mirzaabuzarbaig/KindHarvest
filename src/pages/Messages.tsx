@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, MessageSquare } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 interface UserLite { id: string; full_name?: string | null; avatar_url?: string | null; }
 interface Message { id?: string; sender_id: string; receiver_id: string; content: string; created_at: string; }
@@ -173,6 +174,7 @@ export default function Messages() {
 
   return (
     <div className="min-h-screen container mx-auto px-4 py-8">
+      <BackButton className="mb-4" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Contacts */}
         <Card className="md:col-span-1 p-3">

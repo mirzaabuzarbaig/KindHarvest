@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { useNavigate } from "react-router-dom";
 
 export default function Requests(){
@@ -26,18 +27,33 @@ export default function Requests(){
     if (r === "donor"){
       const { data } = await supabase
         .from("donation_requests")
-        .select("request_id, food_id, recipient_id, status, profiles:recipient_id(full_name)")
+        .select("request_id, food_id, recipient_id, status, profiles:recipient_id(full_name, address), food:food_id(title, general_area)")
         .eq("donor_id", uid)
         .order("created_at", { ascending: false });
-      setIncoming(data||[]);
+      const rows = data || [];
+      // Backfill profiles explicitly to be safe
+      const ids = Array.from(new Set(rows.map((x:any)=>x.recipient_id))).filter(Boolean);
+      if (ids.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, full_name, address").in("id", ids);
+        const map = new Map<string, any>((profs||[]).map((p:any)=>[p.id,p]));
+        rows.forEach((x:any)=>{ x.profile_full_name = x.profiles?.full_name || map.get(x.recipient_id)?.full_name; x.profile_address = x.profiles?.address || map.get(x.recipient_id)?.address; });
+      }
+      setIncoming(rows);
       setOutgoing([]);
     } else {
       const { data } = await supabase
         .from("donation_requests")
-        .select("request_id, food_id, donor_id, status, profiles:donor_id(full_name)")
+        .select("request_id, food_id, donor_id, status, profiles:donor_id(full_name, address), food:food_id(title, general_area)")
         .eq("recipient_id", uid)
         .order("created_at", { ascending: false });
-      setOutgoing(data||[]);
+      const rows = data || [];
+      const ids = Array.from(new Set(rows.map((x:any)=>x.donor_id))).filter(Boolean);
+      if (ids.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, full_name, address").in("id", ids);
+        const map = new Map<string, any>((profs||[]).map((p:any)=>[p.id,p]));
+        rows.forEach((x:any)=>{ x.profile_full_name = x.profiles?.full_name || map.get(x.donor_id)?.full_name; x.profile_address = x.profiles?.address || map.get(x.donor_id)?.address; });
+      }
+      setOutgoing(rows);
       setIncoming([]);
     }
   };
@@ -49,6 +65,7 @@ export default function Requests(){
 
   return (
     <div className="min-h-screen container mx-auto px-4 py-8 space-y-6">
+      <BackButton />
       <h1 className="text-2xl font-bold">Requests</h1>
       {role === "donor" ? (
         <Card>
@@ -58,8 +75,9 @@ export default function Requests(){
             {incoming.map((r)=> (
               <div key={r.request_id} className="flex items-center justify-between rounded-lg border p-3">
                 <div className="space-y-1">
-                  <div className="font-medium">{r.profiles?.full_name || r.recipient_id}</div>
-                  <div className="text-xs text-muted-foreground">Listing: {r.food_id}</div>
+                  <div className="font-medium">From: {r.profile_full_name || r.profiles?.full_name || 'Recipient'}</div>
+                  <div className="text-xs text-muted-foreground">{r.profile_address || r.profiles?.address || 'Address not provided'}</div>
+                  <div className="text-xs text-muted-foreground">Listing: {r.food?.title || 'Untitled'}{r.food?.general_area ? ` • ${r.food.general_area}` : ''}</div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="capitalize">{r.status}</Badge>
@@ -87,8 +105,9 @@ export default function Requests(){
             {outgoing.map((r)=> (
               <div key={r.request_id} className="flex items-center justify-between rounded-lg border p-3">
                 <div className="space-y-1">
-                  <div className="font-medium">{r.profiles?.full_name || r.donor_id}</div>
-                  <div className="text-xs text-muted-foreground">Listing: {r.food_id}</div>
+                  <div className="font-medium">To: {r.profile_full_name || r.profiles?.full_name || 'Donor'}</div>
+                  <div className="text-xs text-muted-foreground">{r.profile_address || r.profiles?.address || 'Address not provided'}</div>
+                  <div className="text-xs text-muted-foreground">Listing: {r.food?.title || 'Untitled'}{r.food?.general_area ? ` • ${r.food.general_area}` : ''}</div>
                 </div>
                 <Badge variant="outline" className="capitalize">{r.status}</Badge>
               </div>

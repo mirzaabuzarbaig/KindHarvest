@@ -200,12 +200,16 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Right inbox card */}
+              {/* Right quotation card */}
               <div>
-                <div className="rounded-2xl border bg-card p-6 h-full">
-                  <p className="text-lg font-semibold mb-2">Inbox</p>
-                  <div className="text-4xl font-bold">23</div>
-                  <p className="text-sm text-muted-foreground">New messages</p>
+                <div className="rounded-2xl border bg-card p-6 h-full flex flex-col justify-between">
+                  <div>
+                    <p className="text-sm uppercase tracking-wide text-muted-foreground">Thought for today</p>
+                    <blockquote className="mt-3 text-xl font-medium leading-relaxed">
+                      “When we share food, we share hope. A small act can make a big difference.”
+                    </blockquote>
+                  </div>
+                  <p className="mt-4 text-sm text-muted-foreground">Join the mission to reduce waste and nourish communities.</p>
                 </div>
               </div>
             </div>
