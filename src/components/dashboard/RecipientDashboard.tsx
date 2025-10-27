@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MapPin, Package, User, Star, Sparkles, Filter } from "lucide-react";
+import { Calendar, MapPin, Package, User, Star, Sparkles, Filter, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 
@@ -27,6 +27,43 @@ const RecipientDashboard = ({ userId, profile, userRole }: RecipientDashboardPro
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+  const clearFilters = () => {
+    setSearchQuery("");
+    setCategoryFilter("all");
+    setSortBy("recent");
+  };
+
+  const sendRequest = async (listing: any) => {
+    if (!userId) return;
+    if (listing.donor_id === userId) {
+      toast({ title: "Cannot request your own listing", variant: "destructive" });
+      return;
+    }
+    try {
+      // Check existing request
+      const { data: existing } = await supabase
+        .from("donation_requests")
+        .select("request_id,status")
+        .eq("recipient_id", userId)
+        .eq("food_id", listing.id)
+        .in("status", ["pending", "accepted"]);
+      if ((existing || []).length > 0) {
+        toast({ title: "Request already sent", description: "You have an active request for this item." });
+        return;
+      }
+      const { error } = await supabase.from("donation_requests").insert({
+        donor_id: listing.donor_id,
+        recipient_id: userId,
+        food_id: listing.id,
+        status: "pending",
+      });
+      if (error) throw error;
+      toast({ title: "Request sent", description: "The donor will review your request." });
+    } catch (e) {
+      if (import.meta.env.DEV) console.error(e);
+      toast({ title: "Failed to send request", variant: "destructive" });
+    }
+  };
 
   useEffect(() => {
     fetchListings();
@@ -189,15 +226,41 @@ const RecipientDashboard = ({ userId, profile, userRole }: RecipientDashboardPro
             Discover and request food donations in your area
           </p>
         </div>
-        <Button 
-          onClick={handleAIMatch} 
-          disabled={matchingLoading || listings.length === 0}
-          className="gap-2"
-        >
-          <Sparkles className="w-4 h-4" />
-          {matchingLoading ? "Analyzing..." : "AI Match"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={clearFilters}
+            variant="outline"
+            className="gap-2"
+          >
+            Clear Filters
+          </Button>
+          <Button 
+            onClick={handleAIMatch} 
+            disabled={matchingLoading || listings.length === 0}
+            className="gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            {matchingLoading ? "Analyzing..." : "AI Match"}
+          </Button>
+        </div>
       </div>
+
+      {/* AI tip banner */}
+      <Card className="border-2">
+        <CardContent className="py-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              Tip: Use <span className="font-semibold">AI Match</span> to prioritize listings tailored to your location and needs.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={handleAIMatch} disabled={matchingLoading || listings.length === 0} className="gap-2">
+                <Sparkles className="w-4 h-4" />
+                {matchingLoading ? "Analyzing..." : "Run AI Match"}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Filters */}
       <Card className="border-2">
@@ -246,6 +309,13 @@ const RecipientDashboard = ({ userId, profile, userRole }: RecipientDashboardPro
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button onClick={clearFilters} variant="outline">Clear</Button>
+            <Button onClick={handleAIMatch} disabled={matchingLoading || listings.length === 0} className="gap-2">
+              <Sparkles className="w-4 h-4" />
+              {matchingLoading ? "Analyzing..." : "Run AI Match"}
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -333,10 +403,13 @@ const RecipientDashboard = ({ userId, profile, userRole }: RecipientDashboardPro
                   </div>
                 )}
 
-                <div className="pt-4">
-                  <p className="text-sm text-muted-foreground text-center">
+                <div className="pt-4 flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
                     Contact details available upon request approval
                   </p>
+                  <Button size="sm" className="gap-2" onClick={() => sendRequest(listing)}>
+                    <Send className="w-4 h-4" /> Send Request
+                  </Button>
                 </div>
               </CardContent>
             </Card>

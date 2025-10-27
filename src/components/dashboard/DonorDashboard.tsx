@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Package, Trash2, Edit } from "lucide-react";
+import { Calendar, MapPin, Package, Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 
@@ -94,17 +94,75 @@ const DonorDashboard = ({ userId }: DonorDashboardProps) => {
     }
   };
 
+  const total = listings.length;
+  const availableCount = listings.filter((l: any) => l.status === "available").length;
+  const claimedCount = listings.filter((l: any) => l.status === "claimed").length;
+  const expiredCount = listings.filter((l: any) => l.status === "expired").length;
+
   if (loading) {
     return <div className="text-center py-12">Loading your donations...</div>;
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold mb-2">Your Food Donations</h2>
-        <p className="text-muted-foreground">
-          Manage and track your food sharing contributions
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Your Food Donations</h2>
+          <p className="text-muted-foreground">
+            Manage and track your food sharing contributions
+          </p>
+        </div>
+        <Button onClick={() => (window.location.href = "/donate")} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Post Donation
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="border-2 hover:shadow-glow transition-shadow">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total</p>
+                <p className="text-2xl font-semibold">{total}</p>
+              </div>
+              <Package className="w-6 h-6 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-2 hover:shadow-glow transition-shadow">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Available</p>
+                <p className="text-2xl font-semibold">{availableCount}</p>
+              </div>
+              <Package className="w-6 h-6 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-2 hover:shadow-glow transition-shadow">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Claimed</p>
+                <p className="text-2xl font-semibold">{claimedCount}</p>
+              </div>
+              <Package className="w-6 h-6 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-2 hover:shadow-glow transition-shadow">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Expired</p>
+                <p className="text-2xl font-semibold">{expiredCount}</p>
+              </div>
+              <Calendar className="w-6 h-6 text-rose-600" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {listings.length === 0 ? (
@@ -150,15 +208,14 @@ const DonorDashboard = ({ userId }: DonorDashboardProps) => {
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
-                    <span className="line-clamp-1">{listing.address}</span>
+                    <span className="line-clamp-1">{listing.general_area || "Location available upon request"}</span>
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-4">
+                <div className="flex justify-end pt-4">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1"
                     onClick={() => handleDelete(listing.id)}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
