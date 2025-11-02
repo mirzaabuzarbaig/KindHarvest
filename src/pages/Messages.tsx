@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, MessageSquare } from "lucide-react";
+import { Send, MessageSquare, Search } from "lucide-react";
 import BackButton from "@/components/BackButton";
+import { Textarea } from "@/components/ui/textarea";
 
 interface UserLite { id: string; full_name?: string | null; avatar_url?: string | null; }
 interface Message { id?: string; sender_id: string; receiver_id: string; content: string; created_at: string; }
@@ -173,53 +174,148 @@ export default function Messages() {
   };
 
   return (
-    <div className="min-h-screen container mx-auto px-4 py-8">
-      <BackButton className="mb-4" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Contacts */}
-        <Card className="md:col-span-1 p-3">
-          <div className="flex items-center gap-2 mb-3 font-semibold"><MessageSquare className="w-4 h-4"/> Conversations</div>
-          <div className="space-y-1 max-h-[70vh] overflow-y-auto">
+    <div className="min-h-screen bg-background">
+      <BackButton className="absolute top-4 left-4 z-10" />
+      <div className="h-screen flex">
+        {/* Contacts Sidebar */}
+        <div className="w-full md:w-[380px] border-r border-border flex flex-col bg-card">
+          {/* Header */}
+          <div className="p-4 border-b border-border bg-card">
+            <div className="flex items-center gap-3 mb-3">
+              <MessageSquare className="w-6 h-6 text-primary" />
+              <h1 className="text-xl font-semibold">Conversations</h1>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search conversations..." 
+                className="pl-9 bg-muted/50 border-none"
+              />
+            </div>
+          </div>
+
+          {/* Contacts List */}
+          <div className="flex-1 overflow-y-auto">
             {contacts.length === 0 && (
-              <div className="text-sm text-muted-foreground p-3">No contacts yet. Interact with listings to start a conversation.</div>
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                No contacts yet. Accept donation requests to start conversations.
+              </div>
             )}
             {contacts.map((c) => (
-              <button key={c.id} onClick={() => setActive(c)} className={`w-full flex items-center gap-3 p-2 rounded-lg text-left hover:bg-muted ${active?.id===c.id? 'bg-muted' : ''}`}>
-                <Avatar className="h-8 w-8"><AvatarImage src={c.avatar_url || ''}/><AvatarFallback>{(c.full_name||'U')[0]}</AvatarFallback></Avatar>
-                <div className="truncate">
-                  <div className="text-sm font-medium truncate">{c.full_name || c.id.slice(0,8)}</div>
+              <button 
+                key={c.id} 
+                onClick={() => setActive(c)} 
+                className={`w-full flex items-center gap-3 p-4 border-b border-border hover:bg-muted/50 transition-colors ${
+                  active?.id === c.id ? 'bg-muted' : ''
+                }`}
+              >
+                <Avatar className="h-12 w-12 ring-2 ring-primary/10">
+                  <AvatarImage src={c.avatar_url || ''} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {(c.full_name || 'U')[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 text-left min-w-0">
+                  <div className="font-semibold text-sm truncate">
+                    {c.full_name || c.id.slice(0, 8)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Tap to open chat
+                  </div>
                 </div>
               </button>
             ))}
           </div>
-        </Card>
+        </div>
 
-        {/* Chat */}
-        <Card className="md:col-span-2 p-3 flex flex-col h-[75vh]">
-          <div className="flex items-center gap-3 border-b pb-3">
-            {active ? (
-              <>
-                <Avatar className="h-8 w-8"><AvatarImage src={active.avatar_url || ''}/><AvatarFallback>{(active.full_name||'U')[0]}</AvatarFallback></Avatar>
-                <div className="font-semibold">{active.full_name || active.id.slice(0,8)}</div>
-              </>
-            ) : (
-              <div className="text-sm text-muted-foreground">Select a conversation</div>
-            )}
-          </div>
-          <div className="flex-1 overflow-y-auto space-y-2 p-3">
-            {msgs.map((m, i) => (
-              <div key={i} className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${m.sender_id===user?.id? 'ml-auto bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                {m.content}
-                <div className="text-[10px] opacity-70 mt-1">{new Date(m.created_at).toLocaleTimeString()}</div>
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col bg-muted/20">
+          {active ? (
+            <>
+              {/* Chat Header */}
+              <div className="p-4 border-b border-border bg-card flex items-center gap-3">
+                <Avatar className="h-10 w-10 ring-2 ring-primary/10">
+                  <AvatarImage src={active.avatar_url || ''} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {(active.full_name || 'U')[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-semibold">{active.full_name || active.id.slice(0, 8)}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {role === 'donor' ? 'Recipient' : 'Donor'}
+                  </div>
+                </div>
               </div>
-            ))}
-            <div ref={endRef} />
-          </div>
-          <form className="flex gap-2 pt-2" onSubmit={(e)=>{e.preventDefault(); send();}}>
-            <Input placeholder="Type a message" value={text} onChange={(e)=>setText(e.target.value)} />
-            <Button type="submit" className="gap-2"><Send className="w-4 h-4"/> Send</Button>
-          </form>
-        </Card>
+
+              {/* Messages */}
+              <div 
+                className="flex-1 overflow-y-auto p-4 space-y-3"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                }}
+              >
+                {msgs.map((m, i) => {
+                  const isSent = m.sender_id === user?.id;
+                  return (
+                    <div key={i} className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}>
+                      <div 
+                        className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                          isSent 
+                            ? 'bg-primary text-primary-foreground rounded-br-sm' 
+                            : 'bg-card border border-border rounded-bl-sm'
+                        }`}
+                      >
+                        <div className="text-sm break-words whitespace-pre-wrap">{m.content}</div>
+                        <div className={`text-[10px] mt-1 ${isSent ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                          {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={endRef} />
+              </div>
+
+              {/* Input Area */}
+              <div className="p-4 border-t border-border bg-card">
+                <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); send(); }}>
+                  <Textarea
+                    placeholder="Type a message..."
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        send();
+                      }
+                    }}
+                    className="min-h-[44px] max-h-[120px] resize-none bg-muted/50 border-none"
+                    rows={1}
+                  />
+                  <Button 
+                    type="submit" 
+                    size="icon"
+                    className="h-11 w-11 shrink-0 rounded-full"
+                    disabled={!text.trim()}
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </form>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center space-y-3">
+                <MessageSquare className="w-20 h-20 mx-auto text-muted-foreground/30" />
+                <h3 className="text-xl font-semibold text-muted-foreground">Select a conversation</h3>
+                <p className="text-sm text-muted-foreground">
+                  Choose a contact to start messaging
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
