@@ -9,7 +9,13 @@ import { Send, MessageSquare, Search } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { Textarea } from "@/components/ui/textarea";
 
-interface UserLite { id: string; full_name?: string | null; avatar_url?: string | null; }
+interface UserLite { 
+  id: string; 
+  full_name?: string | null; 
+  avatar_url?: string | null; 
+  food_name?: string | null;
+  request_status?: string;
+}
 interface Message { id?: string; sender_id: string; receiver_id: string; content: string; created_at: string; }
 
 export default function Messages() {
@@ -38,12 +44,19 @@ export default function Messages() {
         if (roleData?.role === "donor") {
           const { data } = await supabase
             .from("donation_requests")
-            .select("recipient_id, status, profiles:recipient_id(full_name, avatar_url)")
+            .select("recipient_id, status, food_id, profiles:recipient_id(full_name, avatar_url), food_listings:food_id(title, food_name)")
             .eq("donor_id", session.user.id)
             .eq("status", "accepted");
           const uniq = new Map<string, UserLite>();
           (data || []).forEach((r: any) => {
-            uniq.set(r.recipient_id, { id: r.recipient_id, full_name: r.profiles?.full_name, avatar_url: r.profiles?.avatar_url });
+            const foodName = r.food_listings?.title || r.food_listings?.food_name;
+            uniq.set(r.recipient_id, { 
+              id: r.recipient_id, 
+              full_name: r.profiles?.full_name, 
+              avatar_url: r.profiles?.avatar_url,
+              food_name: foodName,
+              request_status: r.status
+            });
           });
           let arr = Array.from(uniq.values());
           setContacts(arr);
@@ -63,12 +76,19 @@ export default function Messages() {
         } else {
           const { data } = await supabase
             .from("donation_requests")
-            .select("donor_id, status, profiles:donor_id(full_name, avatar_url)")
+            .select("donor_id, status, food_id, profiles:donor_id(full_name, avatar_url), food_listings:food_id(title, food_name)")
             .eq("recipient_id", session.user.id)
             .eq("status", "accepted");
           const uniq = new Map<string, UserLite>();
           (data || []).forEach((r: any) => {
-            uniq.set(r.donor_id, { id: r.donor_id, full_name: r.profiles?.full_name, avatar_url: r.profiles?.avatar_url });
+            const foodName = r.food_listings?.title || r.food_listings?.food_name;
+            uniq.set(r.donor_id, { 
+              id: r.donor_id, 
+              full_name: r.profiles?.full_name, 
+              avatar_url: r.profiles?.avatar_url,
+              food_name: foodName,
+              request_status: r.status
+            });
           });
           let arr = Array.from(uniq.values());
           setContacts(arr);
@@ -198,7 +218,7 @@ export default function Messages() {
           <div className="flex-1 overflow-y-auto">
             {contacts.length === 0 && (
               <div className="p-6 text-center text-sm text-muted-foreground">
-                No contacts yet. Accept donation requests to start conversations.
+                No contacts yet. {role === 'donor' ? 'Accept donation requests' : 'Wait for donors to accept your requests'} to start conversations.
               </div>
             )}
             {contacts.map((c) => (
@@ -216,11 +236,18 @@ export default function Messages() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-left min-w-0">
-                  <div className="font-semibold text-sm truncate">
-                    {c.full_name || c.id.slice(0, 8)}
+                  <div className="flex items-center gap-2">
+                    <div className="font-semibold text-sm truncate">
+                      {c.full_name || c.id.slice(0, 8)}
+                    </div>
+                    {c.request_status === 'accepted' && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium">
+                        Accepted
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Tap to open chat
+                  <div className="text-xs text-muted-foreground truncate">
+                    {c.food_name ? `Re: ${c.food_name}` : 'Tap to open chat'}
                   </div>
                 </div>
               </button>
