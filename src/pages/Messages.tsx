@@ -44,7 +44,7 @@ export default function Messages() {
         if (roleData?.role === "donor") {
           const { data } = await supabase
             .from("donation_requests")
-            .select("recipient_id, status, food_id, profiles:recipient_id(full_name, avatar_url), food_listings:food_id(title, food_name)")
+            .select("recipient_id, status, food_id, profiles:recipient_id(full_name, profile_image_url), food_listings:food_id(title, food_name)")
             .eq("donor_id", session.user.id)
             .eq("status", "accepted");
           const uniq = new Map<string, UserLite>();
@@ -53,7 +53,7 @@ export default function Messages() {
             uniq.set(r.recipient_id, { 
               id: r.recipient_id, 
               full_name: r.profiles?.full_name, 
-              avatar_url: r.profiles?.avatar_url,
+              avatar_url: r.profiles?.profile_image_url,
               food_name: foodName,
               request_status: r.status
             });
@@ -76,7 +76,7 @@ export default function Messages() {
         } else {
           const { data } = await supabase
             .from("donation_requests")
-            .select("donor_id, status, food_id, profiles:donor_id(full_name, avatar_url), food_listings:food_id(title, food_name)")
+            .select("donor_id, status, food_id, profiles:donor_id(full_name, profile_image_url), food_listings:food_id(title, food_name)")
             .eq("recipient_id", session.user.id)
             .eq("status", "accepted");
           const uniq = new Map<string, UserLite>();
@@ -85,7 +85,7 @@ export default function Messages() {
             uniq.set(r.donor_id, { 
               id: r.donor_id, 
               full_name: r.profiles?.full_name, 
-              avatar_url: r.profiles?.avatar_url,
+              avatar_url: r.profiles?.profile_image_url,
               food_name: foodName,
               request_status: r.status
             });
