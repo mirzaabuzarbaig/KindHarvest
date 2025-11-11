@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutGrid, MessageSquare, Settings, ClipboardList } from "lucide-react";
+import { LayoutGrid, MessageSquare, ClipboardList } from "lucide-react";
 
 export default function DashboardSidebar() {
   const linkBase =
@@ -18,9 +18,6 @@ export default function DashboardSidebar() {
           </NavLink>
           <NavLink to="/requests" className={({isActive})=>`${linkBase} ${isActive?active:''}`}>
             <ClipboardList className="w-4 h-4"/> Requests
-          </NavLink>
-          <NavLink to="/settings" className={({isActive})=>`${linkBase} ${isActive?active:''}`}>
-            <Settings className="w-4 h-4"/> Settings
           </NavLink>
         </nav>
       </div>
