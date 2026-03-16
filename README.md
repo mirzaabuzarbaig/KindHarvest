@@ -1,5 +1,5 @@
 # kindharvest
-🍽️ AI-Powered Food Donation System
+#🍽️ AI-Powered Food Donation System
 
 A modern web platform that connects food donors with nearby NGOs and shelters to reduce food waste and combat hunger through intelligent coordination.
 
