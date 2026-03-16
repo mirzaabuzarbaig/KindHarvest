@@ -3,9 +3,9 @@
 
 A modern web platform that connects food donors with nearby NGOs and shelters to reduce food waste and combat hunger through intelligent coordination.
 
-🔗 Live App: (Add your link here)
+🔗 Live App: https://kindharvest.netlify.app/
 
-🧩 Repo: (Add your GitHub repo link here)
+🧩 Repo: mirzaabuzarbaig/KindHarvest
 
 # 🚀 Overview
 
