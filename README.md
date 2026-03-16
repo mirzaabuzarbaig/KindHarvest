@@ -1,36 +1,46 @@
 # kindharvest
-#🍽️ AI-Powered Food Donation System
+# 🍽️ AI-Powered Food Donation System
 
 A modern web platform that connects food donors with nearby NGOs and shelters to reduce food waste and combat hunger through intelligent coordination.
 
 🔗 Live App: (Add your link here)
+
 🧩 Repo: (Add your GitHub repo link here)
 
-🚀 Overview
+# 🚀 Overview
 
 AI-Powered Food Donation System is a smart redistribution platform focused on minimizing food waste and supporting hunger relief efforts. It allows restaurants, supermarkets, and event organizers to list surplus food, while NGOs and shelters can discover, claim, and coordinate pickups in real time.
 
 Built and deployed using Lovable, with a modern stack of React + TypeScript + Tailwind + shadcn/ui.
 
-✨ Features
+# ✨ Features
 
 🍽️ Food donor and NGO role-based access
+
 📍 Real-time surplus food listing
+
 🤝 Intelligent donor–recipient matching
+
 🗺️ GIS-based route optimization
+
 ⚡ Instant notifications and coordination
+
 📱 Responsive and mobile-first design
+
 🌱 Promotes sustainable food redistribution
+
 ☁️ Hosted via Lovable with continuous deployment
 
-🧰 Tech Stack
-
+# 🧰 Tech Stack
 Platform: Lovable
 
 Frontend: React (Vite + TypeScript)
+
 Styling: Tailwind CSS + shadcn/ui
-Deployment: Lovable
+
+Deployment: netlify
 Package Manager: npm or bun
+
 Optional Backend / Database: Supabase / API integration
 
 📂 Project Structure
@@ -49,7 +59,7 @@ Optional Backend / Database: Supabase / API integration
 ├── vite.config.ts  
 ├── tsconfig.json  
 └── README.md  
-⚙️ Getting Started
+# ⚙️ Getting Started
 Prerequisites
 
 Node.js (v18+ recommended)
