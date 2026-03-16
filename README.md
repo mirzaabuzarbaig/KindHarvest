@@ -1,4 +1,4 @@
-# kindharvest
+# KindHarvest
 # 🍽️ AI-Powered Food Donation System
 
 A modern web platform that connects food donors with nearby NGOs and shelters to reduce food waste and combat hunger through intelligent coordination.
@@ -107,6 +107,9 @@ This project is licensed under the MIT License.
 # 💬 Contact
 
 Developer: Mirza Abuzar Baig
-🔗 GitHub:
+
+Email : abuzarbaig09@gmail.com
+
+🔗 GitHub: https://github.com/mirzaabuzarbaig
 
 ### “Turning surplus food into hope — one meal at a time.” ❤️
