@@ -60,55 +60,53 @@ Optional Backend / Database: Supabase / API integration
 ├── tsconfig.json  
 └── README.md  
 # ⚙️ Getting Started
-Prerequisites
+## Prerequisites
 
-Node.js (v18+ recommended)
+- Node.js (v18+ recommended)
 
-npm or bun package manager
+- npm or bun package manager
 
-(Optional) Supabase or any backend API
+- (Optional) Supabase or any backend API
 
 Installation
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
-npm install
-Development
-npm run dev
+git clone https://github.com/mirzaabuzarbaig/KindHarvest.git
+cd KindHarvest
+- npm install
+  
+### Development
+- npm run dev
 
-Then open: 👉 http://localhost:5173
 
-Production Build
-npm run build
-npm run preview
-🖼️ Screenshots
+# Production Build
+<img width="1000" height="809" alt="Screenshot 2026-02-22 122943" src="https://github.com/user-attachments/assets/b91b8ad0-f01a-488b-85c1-6009da76370e" />
+<img width="1200" height="500" alt="Screenshot 2026-02-22 123210" src="https://github.com/user-attachments/assets/16a5535c-8f31-44b3-abc9-b1d1b4ef732f" />
+<img width="1005" height="867" alt="Screenshot 2026-02-22 123226" src="https://github.com/user-attachments/assets/9e4305f0-b4d3-4fa1-92e0-375dda96662c" />
+<img width="909" height="864" alt="Screenshot 2026-02-22 123244" src="https://github.com/user-attachments/assets/355ac0ec-7fc5-46b1-86d3-5cc0962c6340" />
+<img width="1894" height="877" alt="Screenshot 2026-02-22 123318" src="https://github.com/user-attachments/assets/ef0cb559-1730-4b69-906b-fbaae0040516" />
+<img width="606" height="860" alt="Screenshot 2026-02-22 123358" src="https://github.com/user-attachments/assets/7dbeac8b-9e18-43fe-862a-c7229e844e3b" />
+<img width="1497" height="691" alt="Screenshot 2026-02-22 123427" src="https://github.com/user-attachments/assets/8f587f4f-766f-4bc9-9c60-3e75c9fd6b90" />
 
-(Add screenshots of your homepage, donor dashboard, NGO dashboard, etc.)
 
-image
-image
-image
-image
-image
 
-🤝 Contributing
+# 🤝 Contributing
 
-Fork the repository
+- Fork the repository
 
-Create a feature branch:
+- Create a feature branch:
 git checkout -b feature/my-new-feature
 
-Commit changes:
+- Commit changes:
 git commit -m "Add new feature"
 
-Push the branch and open a Pull Request
+- Push the branch and open a Pull Request
 
-📄 License
+# 📄 License
 
 This project is licensed under the MIT License.
 
-💬 Contact
+# 💬 Contact
 
-Developer: (Your Name)
-🔗 GitHub: (Your GitHub profile link)
+Developer: Mirza Abuzar Baig
+🔗 GitHub:
 
-“Turning surplus food into hope — one meal at a time.” ❤️
+### “Turning surplus food into hope — one meal at a time.” ❤️
